@@ -12,23 +12,26 @@
 // Total Steps Default (TSD)
 #define TSD 1
 // weather test
-#define KEY_NAME 0
-#define KEY_STEPS 1
+#define KEY_P1 0
+#define KEY_S1 1
+#define KEY_P2 2
+#define KEY_S2 3
 #define KEY_DATA 5
 
 static Window *window;
 static Window *menu_window;
 static Window *pedometer;
 static Window *dev_info;
+static Window *leadership_info;
 
 static SimpleMenuLayer *pedometer_settings;
 static SimpleMenuItem menu_items[7];
 static SimpleMenuSection menu_sections[1];
 
 // Menu Item names and subtitles
-char *item_names[7] = { "Start", "Overall Steps", "Overall Calories", "Sensitivity", "Theme", "Version", "About" };
+char *item_names[7] = { "Start", "Leaderboard", "Overall Steps", "Overall Calories", "Sensitivity", "Theme", "About" };
 
-char *item_sub[7] = { "Lets Exercise!", "0 in Total", "0 Burned", "", "", "v1.5-RELEASE", "Jathusan T." };
+char *item_sub[7] = { "Lets Exercise!", "Where do you stand?", "0 in Total", "0 Burned", "", "", "Hack the Planet" };
 
 // Timer used to determine next step check
 static AppTimer *timer;
@@ -44,6 +47,7 @@ TextLayer *calories;
 
 static TextLayer *s_time_layer;
 static TextLayer *s_weather_layer;
+static TextLayer *leadership_layer;
 
 // Bitmap Layers
 static GBitmap *btn_dwn;
@@ -75,8 +79,10 @@ int X_DELTA_TEMP, Y_DELTA_TEMP, Z_DELTA_TEMP = 0;
 int lastX, lastY, lastZ, currX, currY, currZ = 0;
 int sensitivity = 1;
 
-int steps2 = 0;
-char *name = "dank";
+char *p1 = "dank";
+char *p2 = "dank2";
+int s1 = 0;
+int s2 = 0;
 
 long pedometerCount = 0;
 long caloriesBurned = 0;
@@ -131,7 +137,7 @@ void calibration_callback(int index, void *ctx) {
 
 	cal = determineCal(sensitivity);
 	
-	menu_items[3].subtitle = cal;
+	menu_items[4].subtitle = cal;
 	layer_mark_dirty(simple_menu_layer_get_layer(pedometer_settings));
 }
 
@@ -183,6 +189,15 @@ void set_click_handler(ClickRecognizerRef recognizer, void *context) {
 	window_stack_pop(true);
 }
 
+void leadership_callback(int index, void *ctx) {
+  leadership_info = window_create();
+
+	window_set_window_handlers(leadership_info, (WindowHandlers ) { .load = leadership_load,
+					.unload = leadership_unload, });
+
+	window_stack_push(leadership_info, true);
+}
+
 void setup_menu_items() {
 	static char buf[] = "1234567890abcdefg";
 	snprintf(buf, sizeof(buf), "%ld in Total", totalSteps);
@@ -200,16 +215,18 @@ void setup_menu_items() {
 		if (i == 0) {
 			menu_items[i].callback = start_callback;
 		} else if (i == 1) {
+      menu_items[i].callback = leadership_callback;
+    } else if (i==2) {
 			menu_items[i].subtitle = buf;
-		} else if (i == 2) {
+		} else if (i == 3) {
 			menu_items[i].subtitle = buf2;
-		} else if (i == 3){
+		} else if (i == 4){
 			menu_items[i].subtitle = determineCal(sensitivity);
 			menu_items[i].callback = calibration_callback;
-		} else if (i == 4) {
+		} else if (i == 5) {
 			menu_items[i].subtitle = theme;
 			menu_items[i].callback = theme_callback;
-		} else if (i == 5 || i == 6) {
+		} else if (i == 6 || i == 6) {
 			menu_items[i].callback = info_callback;
 		}
 	}
@@ -336,16 +353,7 @@ void info_load(Window *window) {
   
   char *stepPerson = malloc(strlen("Name: Cody Casey\nSteps: 1224") + sizeof(char));
   
-	strcpy(stepPerson, "Name: ");
-  strcat(stepPerson, name);
-  strcat(stepPerson, "\nSteps: ");
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "debug steps %d", steps2);
-
-  char stepTemp[strlen("1224") + sizeof(char)];
-  snprintf(stepTemp, sizeof(stepTemp), "%d", steps2);
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "steptemp is %s", stepTemp);
-
-	strcat(stepPerson, stepTemp);
+	strcpy(stepPerson, "Made by:\n Bryan Tan\n Sandile Keswa\n Christina Zhu ");
   
 	text_layer_set_text(s_weather_layer, stepPerson);
 }
@@ -353,6 +361,49 @@ void info_load(Window *window) {
 void info_unload(Window *window) {
 	text_layer_destroy(s_weather_layer);
 	window_destroy(dev_info);
+}
+
+void leadership_load(Window *window) {
+	leadership_layer = text_layer_create(GRect(0, 0, 150, 150));
+
+	if (isDark) {
+		window_set_background_color(leadership_info, GColorBlack);
+		text_layer_set_background_color(leadership_layer, GColorClear);
+		text_layer_set_text_color(leadership_layer, GColorWhite);
+	} else {
+		window_set_background_color(leadership_info, GColorWhite);
+		text_layer_set_background_color(leadership_layer, GColorClear);
+		text_layer_set_text_color(leadership_layer, GColorBlack);
+	}
+
+	layer_add_child(window_get_root_layer(leadership_info), (Layer*) leadership_layer);
+	text_layer_set_text_alignment(leadership_layer, GTextAlignmentCenter);
+  
+  char *stepPerson = malloc(strlen("Name: Cody Casey\nSteps: 1224Name: Cody Casey\nSteps: 1224Name: Cody Casey\nSteps: 1224") + sizeof(char));
+  
+  strcpy(stepPerson, p1);
+  strcat(stepPerson, "\nSteps: ");
+
+  char stepTemp[strlen("12234") + sizeof(char)];
+  snprintf(stepTemp, sizeof(stepTemp), "%d", s1);
+  strcat(stepPerson, stepTemp);
+
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "steptemp is %s", stepTemp);
+
+  strcat(stepPerson, "\n\n");
+  strcat(stepPerson, p2);
+  strcat(stepPerson, "\nSteps: ");
+  char stepTemp2[strlen("12234") + sizeof(char)];
+  snprintf(stepTemp2, sizeof(stepTemp2), "%d", s2);
+  
+	strcat(stepPerson, stepTemp2);
+  
+	text_layer_set_text(leadership_layer, stepPerson);
+}
+
+void leadership_unload(Window *window) {
+	text_layer_destroy(leadership_layer);
+	window_destroy(leadership_info);
 }
 
 void window_load(Window *window) {
@@ -459,10 +510,19 @@ void resetUpdate() {
 	validZ = false;
 }
 
+static void send_int(int key, int value) {
+  DictionaryIterator *iter;
+  app_message_outbox_begin(&iter);
+  dict_write_int(iter, key, &value, sizeof(int), true);
+  app_message_outbox_send();
+}
+
 void update_ui_callback() {
 	if ((validX && validY && !did_pebble_vibrate) || (validX && validZ && !did_pebble_vibrate)) {
 		pedometerCount++;
 		tempTotal++;
+    
+    send_int(5, pedometerCount);
 
 		caloriesBurned = (int) (pedometerCount / STEPS_PER_CALORIE);
 		static char calBuf[] = "123456890abcdefghijkl";
@@ -475,12 +535,12 @@ void update_ui_callback() {
 
 		static char buf2[] = "123456890abcdefghijkl";
 		snprintf(buf2, sizeof(buf2), "%ld in Total", tempTotal);
-		menu_items[1].subtitle = buf2;
+		menu_items[2].subtitle = buf2;
 
 		static char buf3[] = "1234567890abcdefg";
 		snprintf(buf3, sizeof(buf3), "%ld Burned",
 				(long) (tempTotal / STEPS_PER_CALORIE));
-		menu_items[2].subtitle = buf3;
+		menu_items[3].subtitle = buf3;
 
 		layer_mark_dirty(window_get_root_layer(pedometer));
 		layer_mark_dirty(window_get_root_layer(menu_window));
@@ -514,7 +574,7 @@ static void timer_callback(void *data) {
 
 static void inbox_received_callback(DictionaryIterator *iterator, void *context) {
   // Store incoming information
-  static char temperature_buffer[8];
+  static char temperature_buffer[32];
   static char conditions_buffer[32];
   static char weather_layer_buffer[32];
   
@@ -525,13 +585,19 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
   while(t != NULL) {
     // Which key was received?
     switch(t->key) {
-    case KEY_STEPS:
-//       snprintf(temperature_buffer, sizeof(temperature_buffer), "%dC", (int)t->value->int32);
-      steps2 = (int)t->value->int32;
+    case KEY_S1:
+//       snprintf(steps2, sizeof(temperature_buffer), "%dC", (int)t->value->int32);
+      s1 = (int)t->value->int32;
       break;
-    case KEY_NAME:
-//       snprintf(conditions_buffer, sizeof(conditions_buffer), "%s", t->value->cstring);
-      name = t->value->cstring;
+    case KEY_P1:
+//       snprintf(name, sizeof(conditions_buffer), "%s", t->value->cstring);
+      p1 = t->value->cstring;
+      break;
+    case KEY_P2:
+      p2 = t->value->cstring;
+      break;
+    case KEY_S2:
+      s2 = (int)t->value->int32;
       break;
     default:
       APP_LOG(APP_LOG_LEVEL_ERROR, "Key %d not recognized!", (int)t->key);
@@ -541,9 +607,8 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
     // Look for next item
     t = dict_read_next(iterator);
   }
-  
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "steps %d", steps2);
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "name %s", name);
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "name %s", p1);
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "steps %d", s1);
 
   // Assemble full string and display
 //   snprintf(weather_layer_buffer, sizeof(weather_layer_buffer), "%s, %s", temperature_buffer, conditions_buffer);
