@@ -1,0 +1,103 @@
+{
+    "appKeys": {
+        "KEY_DATA": 5,
+        "KEY_NAME": 0,
+        "KEY_STEPS": 1
+    },
+    "capabilities": [
+        "location"
+    ],
+    "companyName": "zoo.christina@gmail.com",
+    "longName": "pedometer",
+    "projectType": "native",
+    "resources": {
+        "media": [
+            {
+                "file": "fonts/Roboto-Light copy.ttf",
+                "name": "ROBOTO_LT_15",
+                "type": "font"
+            },
+            {
+                "file": "fonts/bebas copy 3.TTF",
+                "name": "BEBAS_40",
+                "type": "font"
+            },
+            {
+                "file": "fonts/bebas copy 2.TTF",
+                "name": "BEBAS_15",
+                "type": "font"
+            },
+            {
+                "file": "fonts/bebas copy.TTF",
+                "name": "BEBAS_30",
+                "type": "font"
+            },
+            {
+                "file": "fonts/Roboto-Light.ttf",
+                "name": "ROBOTO_LT_30",
+                "type": "font"
+            },
+            {
+                "file": "images/down.png",
+                "name": "BTN_DOWN",
+                "type": "png"
+            },
+            {
+                "file": "images/splash.png",
+                "name": "SPLASH",
+                "type": "png"
+            },
+            {
+                "file": "images/flame2.png",
+                "name": "FLAME_BLK",
+                "type": "png"
+            },
+            {
+                "file": "images/ped_blk.png",
+                "name": "PED_BLK",
+                "type": "png"
+            },
+            {
+                "file": "images/flame.png",
+                "name": "FLAME_WHITE",
+                "type": "png"
+            },
+            {
+                "file": "images/ped_white.png",
+                "name": "PED_WHITE",
+                "type": "png"
+            },
+            {
+                "file": "images/statusbar.png",
+                "name": "STATUS_BAR",
+                "type": "png"
+            },
+            {
+                "file": "images/setup.png",
+                "name": "BTN_SETUP",
+                "type": "png"
+            },
+            {
+                "file": "images/up.png",
+                "name": "BTN_UP",
+                "type": "png"
+            },
+            {
+                "file": "fonts/bebas.TTF",
+                "name": "BEBAS_35",
+                "type": "font"
+            }
+        ]
+    },
+    "sdkVersion": "3",
+    "shortName": "pedometer",
+    "targetPlatforms": [
+        "aplite",
+        "basalt"
+    ],
+    "uuid": "19ea71bd-b936-4eba-a4aa-52828263b02d",
+    "versionLabel": "1.0",
+    "watchapp": {
+        "watchface": false
+    }
+}
